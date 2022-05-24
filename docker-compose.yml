@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  apache:
+    container_name: apache
+    build: ./docker/apache
+    links:
+      - php
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/usr/local/apache2/htdocs
+  php:
+    container_name: php
+    build: ./docker/php
+    links:
+      - mysql
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./src:/usr/local/apache2/htdocs
+    working_dir: /usr/local/apache2/htdocs
+  mysql:
+    image: mysql:8.0.27
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'test'
+      MYSQL_DATABASE: magento
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 'test'
+    ports:
+      - "3306:3306"
+    volumes:
+    - ./database/mysql:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8085:80
