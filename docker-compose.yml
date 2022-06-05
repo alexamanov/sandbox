@@ -8,7 +8,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./src:/usr/local/apache2/htdocs
+      - ./m2:/usr/local/apache2/htdocs
   php:
     container_name: php
     build: ./docker/php
@@ -17,11 +17,12 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./src:/usr/local/apache2/htdocs
+      - ./m2:/usr/local/apache2/htdocs
     working_dir: /usr/local/apache2/htdocs
   mysql:
     image: mysql:8.0.27
     container_name: mysql
+    hostname: mysql
     environment:
       MYSQL_ROOT_PASSWORD: 'test'
       MYSQL_DATABASE: magento
@@ -43,3 +44,20 @@ services:
     restart: always
     ports:
       - 8085:80
+  mailhog:
+   image: mailhog/mailhog
+   container_name: mailhog
+   hostname: mailhog
+   ports:
+      - "1025:1025"
+      - "8025:8025"
+  es7.9:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: es7.9
+    hostname: es7.9
+    environment:
+      - node.name=es7.9
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
