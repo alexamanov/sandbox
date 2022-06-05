@@ -18,7 +18,7 @@ Password: admin@123
 ## Phpmyadmin url:
 http://localhost:8085/
 
-#Phpmyadmin credentials:
+## Phpmyadmin credentials:
 Username: root
 Password: **test**
 
