@@ -1,0 +1,103 @@
+diff --git a/Setup/InstallSchema.php b/Setup/InstallSchema.php
+deleted file mode 100644
+index 3b532db..0000000
+--- a/Setup/InstallSchema.php
++++ /dev/null
+@@ -1,43 +0,0 @@
+-<?php
+-
+-namespace Amasty\TestModule\Setup;
+-
+-use Magento\Framework\Setup\InstallSchemaInterface;
+-use Magento\Framework\Setup\ModuleContextInterface;
+-use Magento\Framework\Setup\SchemaSetupInterface;
+-
+-class InstallSchema implements InstallSchemaInterface
+-{
+-    public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
+-    {
+-        $setup->startSetup();
+-
+-        $table = $setup->getConnection()
+-            ->newTable($setup->getTable('amasty_wishes'))
+-            ->addColumn(
+-                'wish_id',
+-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+-                null,
+-                [
+-                    'identity' => true,
+-                    'unsigned' => true,
+-                    'nullable' => false,
+-                    'primary' => true
+-                ],
+-                'Wish ID'
+-            )->addColumn(
+-                'text',
+-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+-                255,
+-                [
+-                   'nullable' => false,
+-                   'default' => ''
+-                ],
+-                'Wish Text'
+-            )->setComment('WishList Table');
+-
+-        $setup->getConnection()->createTable($table);
+-
+-        $setup->endSetup();
+-    }
+-}
+diff --git a/Setup/UpgradeSchema.php b/Setup/UpgradeSchema.php
+deleted file mode 100644
+index 1d1d32d..0000000
+--- a/Setup/UpgradeSchema.php
++++ /dev/null
+@@ -1,31 +0,0 @@
+-<?php
+-
+-namespace Amasty\TestModule\Setup;
+-
+-use Magento\Framework\Setup\ModuleContextInterface;
+-use Magento\Framework\Setup\SchemaSetupInterface;
+-use Magento\Framework\Setup\UpgradeSchemaInterface;
+-
+-class UpgradeSchema implements UpgradeSchemaInterface
+-{
+-    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
+-    {
+-        $setup->startSetup();
+-
+-        if (version_compare($context->getVersion(), '0.0.2', '<')) {
+-            $setup->getConnection()->addColumn(
+-                $setup->getTable('amasty_wishes'),
+-                'done',
+-                [
+-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+-                    'default' => 0,
+-                    'unsigned' => true,
+-                    'nullable' => false,
+-                    'comment' => 'Is Wish done'
+-                ]
+-            );
+-        }
+-
+-        $setup->endSetup();
+-    }
+-}
+diff --git a/etc/db_schema.xml b/etc/db_schema.xml
+new file mode 100644
+index 0000000..781bb2f
+--- /dev/null
++++ b/etc/db_schema.xml
+@@ -0,0 +1,11 @@
++<?xml version="1.0"?>
++<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
++    <table name="amasty_wishes" resource="default" engine="innodb" comment="WishList Table">
++        <column xsi:type="int" name="wish_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Wish ID"/>
++        <column xsi:type="varchar" name="text" nullable="false" length="255" default="" comment="Wish Text"/>
++        <column xsi:type="boolean" name="done" nullable="false" comment="Is Wish done"/>
++        <constraint xsi:type="primary" referenceId="PRIMARY">
++            <column name="wish_id"/>
++        </constraint>
++    </table>
++</schema>
